@@ -14,7 +14,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json(Product::all());
+        $products = Product::all();
+        return response()->json($products);
     }
 
     /**
@@ -30,29 +31,33 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        $attr = $request->all();
+        Product::create($attr);
+        return response()->json("success",200);
+
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Product $product
      * @return \Illuminate\Http\Response
      */
     public function show(Product $product)
     {
-        //
+        return response()->json($product);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Product $product
      * @return \Illuminate\Http\Response
      */
     public function edit(Product $product)
@@ -63,23 +68,27 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Product  $product
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Product $product
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $attr = $request->all();
+        $product->update($attr);
+        return response()->json("success",200);
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Product  $product
+     * @param  \App\Product $product
      * @return \Illuminate\Http\Response
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response()->json("success",200);
     }
 }

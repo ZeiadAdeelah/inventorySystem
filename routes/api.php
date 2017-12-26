@@ -21,5 +21,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //Route::get('/products',function(){
 //   dd(":)");
 //});
-Route::resource('products','ProductController');
-Route::resource('customers','CustomerController');
+
+Route::resource('products', 'ProductController');
+Route::resource('customers', 'CustomerController');
+Route::resource('orders', 'OrderController');
+Route::resource('payments', 'PaymentController');
+
+
+Route::get('/customers/{customer}/orders','CustomerController@getCustomerOrders');
+Route::get('/customers/{customer}/payments','CustomerController@getCustomerPayments');
+
+Route::post('/customers/{customer}/orders','CustomerController@storeCustomerOrder');
+Route::post('/customers/{customer}/payments','CustomerController@storeCustomerPayment');

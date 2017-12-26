@@ -3,10 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    public function customer(){
+    use SoftDeletes;
+
+    protected $fillable = ['order_date', 'order_due_date'];
+
+    public function customer()
+    {
         return $this->belongsTo(Customer::class);
     }
 
