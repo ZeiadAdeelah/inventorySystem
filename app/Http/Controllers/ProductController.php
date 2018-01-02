@@ -12,9 +12,26 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $where = [];
+        if ($request->has('unit')) {
+            $where[] = ['unit',
+                'like',
+                "%" . $request->get('unit') . "%"
+            ];
+        }
+        if ($request->has('price')) {
+            $where[] = ['standard_price',
+                '=',
+                $request->get('price')
+            ];
+        }
+        $products = Product::where($where)->get();
+        foreach ($products as $product) {
+            $ordersQuantities = $product->orders()->sum('quantity');
+            $product->quantity = $product->quantity - $ordersQuantities;
+        }
         return response()->json($products);
     }
 
@@ -38,7 +55,7 @@ class ProductController extends Controller
     {
         $attr = $request->all();
         Product::create($attr);
-        return response()->json("success",200);
+        return response()->json("success", 200);
 
 
     }
@@ -76,7 +93,7 @@ class ProductController extends Controller
     {
         $attr = $request->all();
         $product->update($attr);
-        return response()->json("success",200);
+        return response()->json("success", 200);
 
     }
 
@@ -89,6 +106,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return response()->json("success",200);
+        return response()->json("success", 200);
     }
 }

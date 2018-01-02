@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Order;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -12,9 +13,48 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::all();
+        $query = Order::query();
+        $format = 'd/m/Y';
+
+        if ($request->has('orderDateFrom')) {
+            $date = Carbon::createFromFormat($format, $request->get('orderDateFrom'));
+
+            $query = $query->whereDate('order_date',
+                '>=',
+                $date);
+        }
+        if ($request->has('orderDateTo')) {
+            $date = Carbon::createFromFormat($format, $request->get('orderDateTo'));
+
+            $query = $query->whereDate(
+                'order_date',
+                '<=',
+                $date
+            );
+        }
+        if ($request->has('orderDueDateFrom')) {
+            $date = Carbon::createFromFormat($format, $request->get('orderDueDateFrom'));
+
+            $query = $query->whereDate(
+                'order_due_date',
+                '>=',
+                $date
+            );
+        }
+        if ($request->has('orderDueDateTo')) {
+            $date = Carbon::createFromFormat($format, $request->get('orderDueDateTo'));
+
+            $query = $query->whereDate(
+                'order_due_date',
+                '<=',
+                $date
+            );
+        }
+
+//dd($query->toSql());
+        $orders = $query->get();
         return response()->json($orders);
     }
 
@@ -38,7 +78,7 @@ class OrderController extends Controller
     {
         $attr = $request->all();
         Order::create($attr);
-        return response()->json("success",200);
+        return response()->json("success", 200);
     }
 
     /**
@@ -74,7 +114,7 @@ class OrderController extends Controller
     {
         $attr = $request->all();
         $order->update($attr);
-        return response()->json("success",200);
+        return response()->json("success", 200);
 
     }
 
@@ -87,6 +127,6 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
-        return response()->json("success",200);
+        return response()->json("success", 200);
     }
 }

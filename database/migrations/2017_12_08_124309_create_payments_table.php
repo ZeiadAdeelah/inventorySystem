@@ -18,9 +18,11 @@ class CreatePaymentsTable extends Migration
             $table->double('amount');
             $table->timestamp('payment_date');
             $table->unsignedInteger('customer_id');
+            $table->unsignedInteger('order_id');
 
 
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->nullableTimestamps();
             $table->softDeletes();
 

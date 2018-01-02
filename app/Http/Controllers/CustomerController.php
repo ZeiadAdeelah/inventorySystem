@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\Order;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Mockery\Exception;
 
 class CustomerController extends Controller
 {
@@ -13,9 +16,20 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::all();
+
+        $where = [];
+        foreach ($request->all() as $key => $value) {
+            if (!is_null($value)) {
+                $where[] = [$key,
+                    'like',
+                    "%$value%"
+                ];
+            }
+        }
+        $customers = Customer::where($where)->get();
+
         return response()->json($customers, 200);
 
     }
@@ -103,16 +117,25 @@ class CustomerController extends Controller
         return response()->json($customerPayments);
     }
 
-    public function storeCustomerOrder(Customer $customer,Request $request)
+    public function storeCustomerOrder(Request $request, Customer $customer)
     {
-        $customer->orders()->create($request->all());
-        return response()->json("success",200);
+        $data['order_date'] = $request->get('order_date');
+        $data['order_due_date'] = $request->get('order_due_date');
+        $products = $request->get('products');
+        $order = $customer->orders()->create($data);
+
+//        logger($order->products()->first());
+        foreach ($products as $product) {
+            $order->products()->attach($product['id'], ['quantity' => $product['quantity'],
+                'created_at'=>Carbon::now()]);
+        }
+        return response()->json("success", 200);
     }
 
 
-    public function storeCustomerPayment(Customer $customer,Request $request)
+    public function storeCustomerPayment(Customer $customer, Request $request)
     {
         $customer->payments()->create($request->all());
-        return response()->json("success",200);
+        return response()->json("success", 200);
     }
 }

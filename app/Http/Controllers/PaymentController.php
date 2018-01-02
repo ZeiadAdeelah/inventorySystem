@@ -12,9 +12,27 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $payments = Payment::all();
+        $query = Payment::query();
+        $format = 'd/m/Y';
+        if ($request->has('paymentDateFrom')) {
+            $date = Carbon::createFromFormat($format, $request->get('paymentDateFrom'));
+
+            $query = $query->whereDate('payment_date',
+                '>=',
+                $date);
+        }
+        if ($request->has('paymentDateTo')) {
+            $date = Carbon::createFromFormat($format, $request->get('paymentDateTo'));
+
+            $query = $query->whereDate(
+                'payment_date',
+                '<=',
+                $date
+            );
+        }
+        $payments = $query->get();
         return response()->json($payments);
     }
 
